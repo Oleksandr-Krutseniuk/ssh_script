@@ -15,7 +15,7 @@ scp $FILE_PATH $RECEIVER_USER@$RECEIVER_HOST:/home/ubuntu/received_file >> $LOG_
 FILE_SIZE=$(stat -c%s "$FILE_PATH")
 
 # Отправка команды на сервер-получатель для проверки файла и ожидание подтверждения
-ssh -t -q $RECEIVER_USER@$RECEIVER_HOST << EOF 2>> $LOG_FILE
+ssh -t $RECEIVER_USER@$RECEIVER_HOST << EOF 2>&1 | tee -a $LOG_FILE
 RECEIVED_FILE_SIZE=\$(stat -c%s "/home/ubuntu/received_file")
 
 if [ \$RECEIVED_FILE_SIZE -eq $FILE_SIZE ]; then
