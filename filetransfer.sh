@@ -20,8 +20,8 @@ ssh -T $RECEIVER_USER@$RECEIVER_HOST << EOF | grep -E "File received successfull
 RECEIVED_FILE_SIZE=\$(stat -c%s "$dest_file")
 
 if [ \$RECEIVED_FILE_SIZE -eq $FILE_SIZE ]; then
-    echo "File received successfully. Size match."
+    echo "$CURRENT_DATE File received successfully. Size match."
 else
-    echo "File size doesn't match. Something went wrong."
+    echo "$CURRENT_DATE File size doesn't match. Something went wrong."
 fi
 EOF
