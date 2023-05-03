@@ -8,7 +8,7 @@ RECEIVER_USER="ubuntu"
 # Путь к файлу лога
 LOG_FILE="/home/ubuntu/logfile.log"
 dest_file="/home/ubuntu/received_file4"
-
+CURRENT_DATE=$(date +"%Y-%m-%d %H:%M:%S")
 # Отправка файла на сервер-получатель
 scp $FILE_PATH $RECEIVER_USER@$RECEIVER_HOST:$dest_file >> $LOG_FILE 2>&1
 
