@@ -15,7 +15,7 @@ scp $file_path $receiver_user@$receiver_host:$dest_file >> $log_file
 file_size=$(stat -c%s "$file_path")
 
 # Отправка команды на сервер-получатель для проверки файла и ожидание подтверждения
-ssh -T $receiver_user@$receiver_host << EOF | grep -E "File received successfully\. Size match\.|File size doesn't match\. Something went wrong\." >> $LOG_FILE
+ssh -T $receiver_user@$receiver_host << EOF | grep -E "File received successfully\. Size match\.|File size doesn't match\. Something went wrong\." >> $log_file
 received_file_size=\$(stat -c%s "$dest_file")  
 
 if [ \$received_file_size -eq $file_size ]; then
