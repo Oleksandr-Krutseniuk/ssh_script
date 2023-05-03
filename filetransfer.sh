@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # Имя файла и путь к нему
-FILE_PATH="/home/ubuntu/testfile4"
+FILE_PATH="/home/ubuntu/testfile5"
 # IP или имя сервера-получателя
 RECEIVER_HOST=54.187.59.142
 RECEIVER_USER="ubuntu"
 # Путь к файлу лога
 LOG_FILE="/home/ubuntu/logfile.log"
-dest_file="/home/ubuntu/received_file4"
+dest_file="/home/ubuntu/received_file5"
 CURRENT_DATE=$(date +"%Y-%m-%d %H:%M:%S")
 # Отправка файла на сервер-получатель
 scp $FILE_PATH $RECEIVER_USER@$RECEIVER_HOST:$dest_file >> $LOG_FILE 2>&1
