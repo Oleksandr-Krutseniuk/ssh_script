@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # файл для відправки
-FILE_PATH="/home/ubuntu/testfile5"
+FILE_PATH="/home/ubuntu/testfile6"
 # адреса отримувача
 RECEIVER_HOST=54.187.59.142
 RECEIVER_USER="ubuntu" # користувач на ремоут-хості
 LOG_FILE="/home/ubuntu/logfile.log" # файл з результатом перевірки розміру файлу (відправлений=отриманий)
-dest_file="/home/ubuntu/received_file5" # місце і назва переданого файлу на ремоут-хості(отримувачі)
+dest_file="/home/ubuntu/received_file6" # місце і назва переданого файлу на ремоут-хості(отримувачі)
 CURRENT_DATE=$(date +"%Y-%m-%d %H:%M:%S") # дата перевірки розмірів файлів
 # Отправка файла на сервер-получатель
 scp $FILE_PATH $RECEIVER_USER@$RECEIVER_HOST:$dest_file >> $LOG_FILE #2>&1
