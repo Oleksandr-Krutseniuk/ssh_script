@@ -10,8 +10,8 @@ log_file="/home/ubuntu/logfile.log" # файл з результатом пер�
 current_date=$(date +"%Y-%m-%d %H:%M:%S" | tr ':' '-') # дата перевірки розмірів файлів
 
 # архивирование и дата архивации для последующей сортировки архивов (напр. для поиска бекапов по датам)
-#archive_name="${current_date}_$(basename ${file_path}).tar.gz"
-archive_name="${current_date}_$(basename ${file_path}).tar.gz" # у тар проблеми с ":"
+ 
+archive_name="${$current_date}_$(basename ${$file_path}).tar.gz" #  
 
 tar -zcf "$archive_name" "$file_path"
 
