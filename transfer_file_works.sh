@@ -7,11 +7,11 @@ receiver_host=34.220.97.124
 receiver_user="ubuntu" # користувач на ремоут-хості 
 log_file="/home/ubuntu/logfile.log" # файл з результатом перевірки розміру файлу (відправлений=отриманий)
 #dest_file="/home/ubuntu/received_file" # місце і назва переданого файлу на ремоут-хості(отримувачі)
-current_date=$(date +"%Y-%m-%d %H:%M:%S") # дата перевірки розмірів файлів
+current_date=$(date +"%Y-%m-%d %H:%M:%S" | tr ':' '-') # дата перевірки розмірів файлів
 
 # архивирование и дата архивации для последующей сортировки архивов (напр. для поиска бекапов по датам)
 #archive_name="${current_date}_$(basename ${file_path}).tar.gz"
-archive_name="${current_date}_$(basename ${file_path} | tr ':' '-').tar.gz"
+archive_name="${current_date}_$(basename ${file_path}).tar.gz" # у тар проблеми с ":"
 
 tar -zcf $archive_name $file_path
 
