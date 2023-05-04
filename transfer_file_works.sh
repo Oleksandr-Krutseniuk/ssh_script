@@ -18,7 +18,7 @@ tar -czf "$archive_name" -C "$(dirname ${file_path})" "$(basename ${file_path})"
 
 
 # віправка файлу на сервер-отримувач 
-scp "$archive_name" "$receiver_user@$receiver_host:/home/ubuntu/$archive_name" >> $log_file
+scp "$archive_name" "$receiver_user@$receiver_host:/home/ubuntu/$archive_name" #>> $log_file
 
 # Получение размера файла в битах
 file_size=$(stat -c%s "$archive_name") #поменять на сравнение размера архивов
