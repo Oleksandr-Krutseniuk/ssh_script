@@ -22,7 +22,7 @@ tar -czf "$archive_name" -C "$(dirname ${file_path})" "$(basename ${file_path})"
 
 hashsum=$(sha256sum "$archive_name" | cut -d' ' -f1) # отримання хеш-суми архіву."cut" залишає тільки контрольну суму
 # віправка файлу на сервер-отримувач 
-scp "$archive_name" "$receiver_user@$receiver_host:/home/ubuntu/$archive_name" # якщо потрібно - можна створити змінну для місця зберігання
+scp "$archive_name" "$receiver_user@$receiver_host:/home/ubuntu/$archive_name" > /dev/null # якщо потрібно - можна створити змінну для місця зберігання
 
 
 # перевірка хеш-сум на ремоут-хості та виведення результату в лог-файл на хості-відправнику
