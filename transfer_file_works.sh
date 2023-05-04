@@ -1,12 +1,12 @@
 #!/bin/bash          ЧЕРНОВИК(Попробовать запустить этот)
 
 # файл для відправки
-file_path="/home/ubuntu/testfile7"
+file_path="/home/ubuntu/testfile"
 # адреса отримувача
-receiver_host=54.187.59.142 
+receiver_host=34.220.97.124 
 receiver_user="ubuntu" # користувач на ремоут-хості 
 log_file="/home/ubuntu/logfile.log" # файл з результатом перевірки розміру файлу (відправлений=отриманий)
-dest_file="/home/ubuntu/received_file7" # місце і назва переданого файлу на ремоут-хості(отримувачі)
+#dest_file="/home/ubuntu/received_file" # місце і назва переданого файлу на ремоут-хості(отримувачі)
 current_date=$(date +"%Y-%m-%d %H:%M:%S") # дата перевірки розмірів файлів
 
 # архивирование и дата архивации для последующей сортировки архивов (напр. для поиска бекапов по датам)
@@ -35,6 +35,6 @@ received_file_size=\$(stat -c%s "$archive_name")
 EOF
 
 # в конце можно добавить удаление бекапа если условие тру-можно добавить цикл для сервера-отправителя. например:
-if [ $? -eq 0 ]; then
-    rm -f $archive_name
-fi
+#if [ $? -eq 0 ]; then
+#    rm -f $archive_name
+#fi
