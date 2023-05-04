@@ -7,8 +7,11 @@ receiver_host=34.220.97.124
 receiver_user="ubuntu" # користувач на ремоут-хості 
 log_file="/home/ubuntu/logfile.log" # файл з результатом перевірки розміру файлу (відправлений=отриманий)
 current_date=$(date +"%Y-%m-%d %H:%M:%S" ) # дата перевірки розмірів файлів
+attempts=0 # для повідомлення про 2> невдалі перевірки хеш-сум
 
-  
+
+# безкінечний цикл для повторення віправки архіву на випадок, якщо хеш-суми не співпадуть
+while true; do   
 # архівація файлу
 archive_name="$(basename ${file_path}).tar.gz" # тут буде назва файлу для архівації + ".tar.gz"
  
@@ -21,18 +24,19 @@ hashsum=$(sha256sum "$archive_name" | cut -d' ' -f1) # отримання хеш
 scp "$archive_name" "$receiver_user@$receiver_host:/home/ubuntu/$archive_name" # якщо потрібно - можна створити змінну для місця зберігання
 
 
-# вычисление SHA256-хеш-суммы полученного файла на удаленном сервере и сравнение со значением отправленной хеш-суммы
+# перевірка хеш-сум на ремоут-хості та виведення результату в лог-файл на хості-відправнику
 
-ssh $receiver_user@$receiver_host "sha256sum /home/ubuntu/$archive_name" | awk '{print $1}' | grep "$hashsum" > /dev/null 2>&1 && \
-echo "$current_date File received successfully. Hashsum match." >> $log_file || \
-echo "$current_date Hashsum doesn't match. Something went wrong." >> $log_file
-# на ремоут-хості перевіряється хеш-сума архіву, "awk" вирізає саме значення суми з stdout а grep шукає в виводі "awk" змінну $hashsum, яка
-# яка містить хеш-суму архіву, отриману до відправки на хості-віправнику.якщо результат роботи grep=0,виконується перша echo,якщо не 0-то друга 
-
-
-
-# в конце можно добавить удаление бекапа если условие тру-можно добавить цикл для сервера-отправителя. например:
-#if [ $? -eq 0 ]; then
-#    rm -f $archive_name + сам файл с бекапом
-#fi
-# Архив создается там, откуда запускается команда
+received_hashsum=$(ssh $receiver_user@$receiver_host "sha256sum /home/ubuntu/$archive_name" | awk '{print $1}')
+  if [ "$hashsum" = "$received_hashsum" ]; then # якщо хеш-суми однакові
+    echo "$current_date File received successfully. Hashsum match." >> $log_file
+    rm -f "$file_path" "$archive_name" # видаляє оригінальний файл та архів, якщо хеш-суми співпали
+    break # завершує цикл якщо хеш-суми співпали
+  else # хеш-сумми не співпали
+    attempts=$((attempts+1)) # лічильник невдалих перевірок хеш-сум
+    echo "$current_date Hashsum doesn't match. Something went wrong with $archive_name file." >> $log_file
+      if [ "$attempts" -ge 2 ]; then # 2 або більше невдалих перевірок хеш-сум
+        echo "$current_date Hashsums didn't match for $archive_name file after $attempts attempts" >> $log_file
+      fi
+  fi
+  
+done
