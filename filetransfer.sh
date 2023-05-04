@@ -24,3 +24,5 @@ else
     echo "$current_date File size doesn't match. Something went wrong."
 fi
 EOF
+
+# в конце можно добавить удаление бекапа если условие тру
