@@ -1,11 +1,11 @@
 #!/bin/bash   
 
 # файл для відправки
-file_path="/home/ubuntu/testfile"
+file_path="/home/*****/testfile"
 # адреса отримувача
-receiver_host=34.220.97.124 
-receiver_user="ubuntu" # користувач на ремоут-хості 
-log_file="/home/ubuntu/logfile.log" # файл з результатом перевірки розміру файлу (відправлений=отриманий)
+receiver_host= ****** 
+receiver_user="******" # користувач на ремоут-хості 
+log_file="/home/******/logfile.log" # файл з результатом перевірки розміру файлу (відправлений=отриманий)
 current_date=$(date +"%Y-%m-%d %H:%M:%S" ) # дата перевірки розмірів файлів
 attempts=0 # для повідомлення про 2> невдалі перевірки хеш-сум
 
@@ -22,12 +22,12 @@ tar -czf "$archive_name" -C "$(dirname ${file_path})" "$(basename ${file_path})"
 
 hashsum=$(sha256sum "$archive_name") #| cut -d' ' -f1) # отримання хеш-суми архіву."cut" залишає тільки контрольну суму
 # віправка файлу на сервер-отримувач 
-scp "$archive_name" "$receiver_user@$receiver_host:/home/ubuntu/$archive_name" > /dev/null # якщо потрібно - можна створити змінну для місця зберігання
+scp "$archive_name" "$receiver_user@$receiver_host:/home/******/$archive_name" > /dev/null # якщо потрібно - можна створити змінну для місця зберігання
 # після scp у терміналі з'являється назва переданого файлу, що не потрібно для крон-джоби. тому вивід іде в /dev/null 
 
 # перевірка хеш-сум на ремоут-хості та виведення результату в лог-файл на хості-відправнику
 
-received_hashsum=$(ssh $receiver_user@$receiver_host "sha256sum /home/ubuntu/$archive_name" | awk '{print $1}')
+received_hashsum=$(ssh $receiver_user@$receiver_host "sha256sum /home/******/$archive_name" | awk '{print $1}')
   if [ "$hashsum" = "$received_hashsum" ]; then # якщо хеш-суми однакові
     echo "$current_date File received successfully. Hashsum match." >> $log_file
     rm -f "$file_path" "$archive_name" # видаляє оригінальний файл та архів, якщо хеш-суми співпали

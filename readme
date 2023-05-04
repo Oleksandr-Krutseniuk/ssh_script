@@ -1,0 +1,14 @@
+transfer_file_script.sh
+
+Script aimed at SSH-channel file transmission from 1 host to another.
+Script gets a file, archives it and tries to transfer a file to the remote host.
+The success of transmission is checked via file presence on a remote host and hash-sum comparison of sent and recieved file.
+The results of successful or failed transmission are put in a log-file located on a sender - host.
+Additionaly:
+To establish SSH connection for the 1 time do the following:
+1. generate a key on a sender
+ssh-keygen -t rsa -b 4096 -C "bastion_key" 
+2. perform a command to allow ssh-agent for your private key usage
+eval "$(ssh-agent -s)" ssh-add ~/.ssh/id_rsa
+3. If needed, chech the /etc/ssh/sshd_config on receiver host and uncomment (or add) PubkeyAuthentication yes
+4. Put generated public key to ~/.ssh/authorized_keys on remote host 
