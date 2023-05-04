@@ -13,7 +13,7 @@ current_date=$(date +"%Y-%m-%d %H:%M:%S" | tr ':' '-') # дата перевір
 #archive_name="${current_date}_$(basename ${file_path}).tar.gz"
 archive_name="${current_date}_$(basename ${file_path}).tar.gz" # у тар проблеми с ":"
 
-tar -zcf $archive_name $file_path
+tar -zcf "$archive_name" "$file_path"
 
 # Отправка файла на сервер-получатель
 scp $archive_name $receiver_user@$receiver_host:$archive_name >> $log_file  #возможно вывод в лог_файл можно убрать-протестить
