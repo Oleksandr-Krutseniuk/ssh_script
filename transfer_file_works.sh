@@ -10,12 +10,12 @@ log_file="/home/ubuntu/logfile.log" # файл з результатом пер�
 current_date=$(date +"%Y-%m-%d %H:%M:%S" | tr ':' '-') # дата перевірки розмірів файлів
 
 # архивирование и дата архивации для последующей сортировки архивов (напр. для поиска бекапов по датам)
- tar -czf "$archive_name" -C "$(dirname ${file_path})" "$(basename ${file_path})"
+ 
   
 # архивирование файла
 archive_name="$(basename ${file_path}).tar.gz"
-#tar -zcf "$archive_name" "$file_path"
-
+ 
+tar -czf "$archive_name" -C "$(dirname ${file_path})" "$(basename ${file_path})"
 # Отправка файла на сервер-получатель
  
 #scp "$archive_name" "$receiver_user@$receiver_host:/home/ubuntu/$(basename $archive_name)" >> $log_file
