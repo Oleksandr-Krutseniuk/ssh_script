@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Имя файла и путь к нему
+FILE_PATH="/home/ubuntu/testfile4"
+# IP или имя сервера-получателя
+RECEIVER_HOST=54.187.59.142
+RECEIVER_USER="ubuntu"
+# Путь к файлу лога
+LOG_FILE="/home/ubuntu/logfile.log"
+dest_file="/home/ubuntu/"
+# Имя архива
+ARCHIVE_NAME="$(basename ${FILE_PATH}).tar.gz"
+
+# Получение текущей даты и времени
+CURRENT_DATE=$(date +"%Y-%m-%d %H:%M:%S")
+
+# Архивирование файла
+tar -zcvf $ARCHIVE_NAME $FILE_PATH >> $LOG_FILE 2>&1
+
+# Отправка архива на сервер-получатель
+scp $ARCHIVE_NAME $RECEIVER_USER@$RECEIVER_HOST:$dest_file >> $LOG_FILE 2>&1
+
+# Получение размера файла в битах
+FILE_SIZE=$(stat -c%s "$FILE_PATH")
+
+# Отправка команды на сервер-получатель для проверки файла и ожидание подтверждения
+ssh -T $RECEIVER_USER@$RECEIVER_HOST << EOF | grep -E "File received successfully\. Size match\.|File size doesn't match\. Something went wrong\.|File not found on the remote server\." >> $LOG_FILE
+if [ -f "$dest_file$ARCHIVE_NAME" ]; then
+    # Разархивирование файла
+    tar -zxvf $dest_file$ARCHIVE_NAME >> $LOG_FILE 2>&1
+    # Проверка размера файла
+    RECEIVED_FILE_SIZE=\$(stat -c%s "$FILE_PATH")
+    if [ \$RECEIVED_FILE_SIZE -eq $FILE_SIZE ]; then
+        echo "$CURRENT_DATE File received successfully. Size match."
+    else
+        echo "$CURRENT_DATE File size doesn't match. Something went wrong."
+    fi
+else
+    echo "$CURRENT_DATE File not found on the remote server."
+fi
+EOF
+
+# Удаление временного архива
+rm -f $ARCHIVE_NAME
