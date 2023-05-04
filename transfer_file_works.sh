@@ -17,8 +17,8 @@ archive_name="${current_date}_$(basename ${file_path}).tar.gz"
 tar -zcf "$archive_name" "$file_path"
 
 # Отправка файла на сервер-получатель
-
-scp "$archive_name" "$receiver_user@$receiver_host:/home/ubuntu/$archive_name" >> $log_file
+ 
+scp "$archive_name" "$receiver_user@$receiver_host:/home/ubuntu/$(basename $archive_name)" >> $log_file
 
 # Получение размера файла в битах
 file_size=$(stat -c%s "$archive_name") #поменять на сравнение размера архивов
@@ -26,10 +26,10 @@ file_size=$(stat -c%s "$archive_name") #поменять на сравнение
 # Отправка команды на сервер-получатель для проверки файла и ожидание подтверждения
 ssh -T $receiver_user@$receiver_host << EOF | grep -E "File received successfully\. Size match\.|File size doesn't match\. Something went wrong\." >> $log_file
  
-received_file_size=\$(stat -c%s "/home/ubuntu/$archive_name")
+ 
+received_file_size=$(stat -c%s "/home/ubuntu/$(basename $archive_name)")
 
-# тут:
--Т - вход без пароля; grep позволяет отсеять приветствие при выполнении ssh-команды и вывести только результаты цикла в файл
+
 
   if [ \$received_file_size -eq $file_size ]; then
     echo "$current_date File received successfully. Size match." # можно добавить имя архива, который был доставлен
