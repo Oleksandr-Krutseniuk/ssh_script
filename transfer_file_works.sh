@@ -14,8 +14,8 @@ attempts=0 # для повідомлення про 2> невдалі перев
 while true; do   
 # архівація файлу
 archive_name="$(basename ${file_path}).tar.gz" # тут буде назва файлу для архівації + ".tar.gz"
- 
-tar -czf "$archive_name" -C "$(dirname ${file_path})" "$(basename ${file_path})" > 2>/dev/null 2>&1 # скинуть вывод, ато он светится в терминале
+   
+tar -czf "$archive_name" -C "$(dirname ${file_path})" "$(basename ${file_path})" &>/dev/null # скинуть вывод, ато он светится в терминале
 #        | назва архіву    | місце файлу для архівації  | назва файлу для архівації
 # q - вимикає вивід файлу з архівом при запуску скрипта
 
