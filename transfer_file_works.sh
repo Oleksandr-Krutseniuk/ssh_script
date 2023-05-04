@@ -12,13 +12,14 @@ current_date=$(date +"%Y-%m-%d %H:%M:%S" | tr ':' '-') # дата перевір
 # архивирование и дата архивации для последующей сортировки архивов (напр. для поиска бекапов по датам)
  
   
-archive_name="${current_date}_$(basename ${file_path}).tar.gz"
-
+# архивирование файла
+archive_name="$(basename ${file_path}).tar.gz"
 tar -zcf "$archive_name" "$file_path"
 
 # Отправка файла на сервер-получатель
  
-scp "$archive_name" "$receiver_user@$receiver_host:/home/ubuntu/$(basename $archive_name)" >> $log_file
+#scp "$archive_name" "$receiver_user@$receiver_host:/home/ubuntu/$(basename $archive_name)" >> $log_file
+scp "$archive_name" "$receiver_user@$receiver_host:/home/ubuntu/$archive_name" >> $log_file
 
 # Получение размера файла в битах
 file_size=$(stat -c%s "$archive_name") #поменять на сравнение размера архивов
@@ -27,7 +28,7 @@ file_size=$(stat -c%s "$archive_name") #поменять на сравнение
 ssh -T $receiver_user@$receiver_host << EOF | grep -E "File received successfully\. Size match\.|File size doesn't match\. Something went wrong\." >> $log_file
  
  
-received_file_size=$(stat -c%s "/home/ubuntu/$(basename $archive_name)")
+received_file_size=\$(stat -c%s "/home/ubuntu/$archive_name")
 
 
 
