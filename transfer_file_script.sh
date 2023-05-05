@@ -1,17 +1,23 @@
 #!/bin/bash   
 
-# файл для відправки
 
-#НОВЫЕ ПЕРЕМЕННЫЕ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
 # 
-key=/home/ubuntu/3_key # ключ для ssh-коннекту
-port_number=2222
+source /home/ubuntu/var_file.txt # файл зі змінними
+# key= ключ для ssh-коннекту в файлі зі змінними var_file.txt
+# port_number= номер порту ssh-коннекту в файлі зі змінними var_file.txt
+# backup_host= адреса бекап хосту в файлі зі змінними var_file.txt 
+# backup_user= remote -user в файлі зі змінними var_file.txt
+# dbHost =                                     > в файлі зі змінними var_file.txt
+# $dbUser =                                    > в файлі зі змінними var_file.txt
+# $dbName =                                    > в файлі зі змінними var_file.txt
+# $dbPassword =                                > в файлі зі змінними var_file.txt
+
+file_path="/home/ubuntu/testfile" # файл для відправки
 
 
-file_path="/home/ubuntu/testfile"
-# адреса отримувача
-backup_host="54.189.139.2" 
-backup_user="ubuntu" # користувач на ремоут-хості 
+ 
 log_file="/home/ubuntu/logfile.log" # файл з результатом перевірки розміру файлу (відправлений=отриманий)
 current_date=$(date +"%Y-%m-%d %H:%M:%S" ) # дата перевірки розмірів файлів
 attempts=0 # для повідомлення про 2> невдалі перевірки хеш-сум
@@ -39,7 +45,7 @@ scp -i "$key" -P "$port_number" "$archive_name" "$backup_user@$backup_host:/home
 # тому вивід іде в /dev/null 
 
 # перевірка хеш-сум на ремоут-хості та виведення результату в лог-файл на хості-відправнику
-
+sleep 2 # возможно команда ниже выполняется раньше, чем файл скопируется
 received_hashsum=$(ssh -i "$key" -p "$port_number" $backup_user@$backup_host "sha256sum /home/ubuntu/$archive_name" | awk '{print $1}')
   if [ "$hashsum" = "$received_hashsum" ]; then # якщо хеш-суми однакові
     echo "$current_date File received successfully. Hashsum match." >> $log_file
@@ -50,7 +56,7 @@ received_hashsum=$(ssh -i "$key" -p "$port_number" $backup_user@$backup_host "sh
     echo "$current_date Hashsum doesn't match. Something went wrong with $archive_name file." >> $log_file
 
 
-      if [ "$attempts" -eq "$max_attempts" ]; then # если 2 или более неудачных проверок хеш-сумм
+      if [ "$attempts" -eq "$max_attempts" ]; then # если 5 проверок хеш-сумм провалены
       echo "ATTENTION!!! $current_date Hashsums didn't match for $archive_name file after $attempts attempts" >> $log_file
       exit 1 # выход из скрипта
       fi
