@@ -1,13 +1,21 @@
 #!/bin/bash   
 
 # файл для відправки
-file_path="/home/******/testfile"
+
+#НОВЫЕ ПЕРЕМЕННЫЕ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# 
+key=/home/ubuntu/3_key # ключ для ssh-коннекту
+port_number=2222
+
+
+file_path="/home/ubuntu/testfile"
 # адреса отримувача
-receiver_host=****** 
-receiver_user="******" # користувач на ремоут-хості 
-log_file="/home/******/logfile.log" # файл з результатом перевірки розміру файлу (відправлений=отриманий)
+backup_host="54.189.139.2" 
+backup_user="ubuntu" # користувач на ремоут-хості 
+log_file="/home/ubuntu/logfile.log" # файл з результатом перевірки розміру файлу (відправлений=отриманий)
 current_date=$(date +"%Y-%m-%d %H:%M:%S" ) # дата перевірки розмірів файлів
 attempts=0 # для повідомлення про 2> невдалі перевірки хеш-сум
+max_attempts=5 # для зупинки скрипта при невдалій перевірці хеш-сум 5 разів
 
 
 # безкінечний цикл для повторення віправки архіву на випадок, якщо хеш-суми не співпадуть
@@ -17,17 +25,22 @@ archive_name="$(basename ${file_path}).tar.gz" # тут буде назва фа
    
 tar -czf "$archive_name" -C "$(dirname ${file_path})" "$(basename ${file_path})" &>/dev/null 2>&1 # скинуть вывод, ато он светится в терминале
 #        | назва архіву    | місце файлу для архівації  | назва файлу для архівації
+# команда має такий вигляд тому, що при використанні "-С" вказується директорія, в якій будуть розміщені файли для архівації, а сам
+# файл можна вказувати з відносним шляхом (або просто назву).це призводить до того, що в архів буде поміщений тільки файл, а не
+# дерево директорій "/home/user/file"
  
 
 
 hashsum=$(sha256sum "$archive_name" | cut -d' ' -f1) # отримання хеш-суми архіву."cut" залишає тільки контрольну суму
-# віправка файлу на сервер-отримувач 
-scp "$archive_name" "$receiver_user@$receiver_host:/home/******/$archive_name" > /dev/null # якщо потрібно - можна створити змінну для місця зберігання
-# після scp у терміналі з'являється назва переданого файлу, що не потрібно для крон-джоби. тому вивід іде в /dev/null 
+# віправка файлу на сервер-отримувач
+ 
+scp -i "$key" -P "$port_number" "$archive_name" "$backup_user@$backup_host:/home/ubuntu/$archive_name" > /dev/null # якщо потрібно - 
+# можна створити змінну для місця зберігання. після scp у терміналі з'являється назва переданого файлу, що не потрібно для крон-джоби. 
+# тому вивід іде в /dev/null 
 
 # перевірка хеш-сум на ремоут-хості та виведення результату в лог-файл на хості-відправнику
 
-received_hashsum=$(ssh $receiver_user@$receiver_host "sha256sum /home/******/$archive_name" | awk '{print $1}')
+received_hashsum=$(ssh -i "$key" -p "$port_number" $backup_user@$backup_host "sha256sum /home/ubuntu/$archive_name" | awk '{print $1}')
   if [ "$hashsum" = "$received_hashsum" ]; then # якщо хеш-суми однакові
     echo "$current_date File received successfully. Hashsum match." >> $log_file
     rm -f "$file_path" "$archive_name" # видаляє оригінальний файл та архів, якщо хеш-суми співпали
@@ -35,6 +48,14 @@ received_hashsum=$(ssh $receiver_user@$receiver_host "sha256sum /home/******/$ar
   else # хеш-сумми не співпали
     attempts=$((attempts+1)) # лічильник невдалих перевірок хеш-сум
     echo "$current_date Hashsum doesn't match. Something went wrong with $archive_name file." >> $log_file
+
+
+      if [ "$attempts" -eq "$max_attempts" ]; then # если 2 или более неудачных проверок хеш-сумм
+      echo "ATTENTION!!! $current_date Hashsums didn't match for $archive_name file after $attempts attempts" >> $log_file
+      exit 1 # выход из скрипта
+      fi
+
+
       if [ "$attempts" -ge 2 ]; then # 2 або більше невдалих перевірок хеш-сум
         echo "$current_date Hashsums didn't match for $archive_name file after $attempts attempts" >> $log_file
       fi
